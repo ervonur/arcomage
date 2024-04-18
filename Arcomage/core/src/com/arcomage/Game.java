@@ -17,7 +17,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Info info2;
     private Card card;
     private Tower tower;
-    private EventManager eventManager;
 
     @Override
     public void create() {
