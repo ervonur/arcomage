@@ -22,6 +22,7 @@ public class Card implements EventListener {
     private float xTemp;
     private float yTemp;
     private boolean usable;
+    private int elapsedMillis;
 
     public Card(Color color, float x, float y, float w, float h) {
         this.fillColor = color;
@@ -31,6 +32,7 @@ public class Card implements EventListener {
         this.h = h;
         sound = Gdx.audio.newSound(Gdx.files.internal("card.mp3"));
         usable = true;
+        elapsedMillis = 0;
     }
 
     public void render(ShapeRenderer shapeRenderer) {
@@ -47,6 +49,17 @@ public class Card implements EventListener {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             shapeRenderer.rect(x - 1, y - 1, w + 1, h + 1);
             shapeRenderer.end();
+        }
+
+        if(selected){
+            elapsedMillis += 20;
+            if(elapsedMillis >= 1000){
+                x = xTemp;
+                y = yTemp;
+                sound.play();
+                selected = false;
+                elapsedMillis = 0;
+            }
         }
     }
 
