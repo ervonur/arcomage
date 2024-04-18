@@ -1,5 +1,6 @@
 package com.arcomage;
 
+import com.arcomage.component.menu.MainMenu;
 import com.arcomage.core.EventManager;
 import com.arcomage.entity.Card;
 import com.arcomage.entity.Info;
@@ -17,6 +18,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Info info2;
     private Card card;
     private Tower tower;
+    private MainMenu mainMenu;
 
     @Override
     public void create() {
@@ -24,9 +26,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         createInfo();
         createCard();
         createTower();
+        createMainMenu();
         Gdx.input.setInputProcessor(this);
         EventManager.register(card);
         EventManager.register(tower);
+        EventManager.register(mainMenu);
+
+    }
+
+    private void createMainMenu(){
+        mainMenu = new MainMenu(shapeRenderer);
     }
 
     private void createCard() {
@@ -66,6 +75,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         info2.dispose();
         card.dispose();
         tower.dispose();
+        mainMenu.dispose();
     }
 
     @Override
