@@ -1,12 +1,15 @@
 package com.arcomage.entity;
 
+import com.arcomage.core.Event;
+import com.arcomage.core.EventListener;
+import com.arcomage.core.EventManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public class Card {
+public class Card implements EventListener {
     private Color fillColor;
     private Color borderColor;
     private float x;
@@ -18,6 +21,7 @@ public class Card {
     private boolean selected;
     private float xTemp;
     private float yTemp;
+    private boolean usable;
 
     public Card(Color color, float x, float y, float w, float h) {
         this.fillColor = color;
@@ -26,6 +30,7 @@ public class Card {
         this.w = w;
         this.h = h;
         sound = Gdx.audio.newSound(Gdx.files.internal("card.mp3"));
+        usable = true;
     }
 
     public void render(ShapeRenderer shapeRenderer) {
@@ -56,6 +61,9 @@ public class Card {
         boolean fy = screenY >= y && Gdx.graphics.getHeight() - screenY <= y + h;
         if (fx && fy) {
             if (button == Input.Buttons.LEFT) {
+                if (!usable) {
+                    return;
+                }
                 if (!selected) {
                     selected = true;
                     xTemp = x;
@@ -63,6 +71,7 @@ public class Card {
                     x = Gdx.graphics.getWidth() / 2 - w / 2;
                     y = Gdx.graphics.getHeight() / 2 - h / 2;
                     sound.play();
+                    EventManager.publish(new Event("CardSelected"));
                 }
             } else if (button == Input.Buttons.RIGHT) {
                 if (selected) {
@@ -72,6 +81,13 @@ public class Card {
                     sound.play();
                 }
             }
+        }
+    }
+
+    @Override
+    public void handleEvent(Event event) {
+        if (event.getName().equals("TowerDestroyed")) {
+            usable = false;
         }
     }
 

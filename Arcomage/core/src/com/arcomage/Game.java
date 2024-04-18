@@ -1,7 +1,9 @@
 package com.arcomage;
 
+import com.arcomage.core.EventManager;
 import com.arcomage.entity.Card;
 import com.arcomage.entity.Info;
+import com.arcomage.entity.Tower;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -14,18 +16,39 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Info info1;
     private Info info2;
     private Card card;
+    private Tower tower;
+    private EventManager eventManager;
 
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
-        float w = 100;
-        float h = 125;
+        createInfo();
+        createCard();
+        createTower();
+        Gdx.input.setInputProcessor(this);
+        EventManager.register(card);
+        EventManager.register(tower);
+    }
+
+    private void createCard() {
+        float w = 70;
+        float h = 100;
         float x = Gdx.graphics.getWidth() / 2 - w / 2;
         float y = 25;
         card = new Card(Color.RED, x, y, w, h);
+    }
+
+    private void createInfo() {
         info1 = new Info("* Left click on the card to select it.", Color.WHITE, 10, Gdx.graphics.getHeight() - 10);
         info2 = new Info("* Right click on the card to deselect it.", Color.WHITE, 10, Gdx.graphics.getHeight() - 30);
-        Gdx.input.setInputProcessor(this);
+    }
+
+    private void createTower() {
+        float x = 25;
+        float y = 25;
+        float w = 50;
+        float h = 300;
+        tower = new Tower(x, y, w, h);
     }
 
     @Override
@@ -34,8 +57,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         info1.render();
         info2.render();
         card.render(shapeRenderer);
-        card.render(shapeRenderer);
-        card.render(shapeRenderer);
+        tower.render(shapeRenderer);
     }
 
     @Override
@@ -44,8 +66,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         info1.dispose();
         info2.dispose();
         card.dispose();
-        card.dispose();
-        card.dispose();
+        tower.dispose();
     }
 
     @Override
