@@ -49,6 +49,7 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         
     }
+    sourceSets.main.resources.srcDirs = ["../assets"]
 }
 
 project(":core") {

@@ -10,6 +10,6 @@ public class DesktopLauncher {
 		config.setForegroundFPS(60);
 		config.setResizable(false);
 		config.setTitle("Arcomage");
-		new Lwjgl3Application(new Game(), config);
+		new Lwjgl3Application(new ArcomageGame(), config);
 	}
 }
