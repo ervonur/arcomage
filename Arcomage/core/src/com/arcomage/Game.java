@@ -1,71 +1,37 @@
 package com.arcomage;
 
-import com.arcomage.core.EventManager;
 import com.arcomage.entity.Card;
-import com.arcomage.entity.Info;
-import com.arcomage.entity.Tower;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Game extends ApplicationAdapter implements InputProcessor {
-    private ShapeRenderer shapeRenderer;
-    private Info info1;
-    private Info info2;
-    private Card card;
-    private Tower tower;
+    private Card card1;
+    private Card card2;
+    private Card card3;
 
     @Override
     public void create() {
-        shapeRenderer = new ShapeRenderer();
-        createInfo();
-        createCard();
-        createTower();
+        final int CARD_WIDTH = 80;
+        final int CARD_HEIGHT = 120;
+
+        final int MID_X = Gdx.graphics.getWidth() / 2 - CARD_WIDTH / 2;
+
+        card1 = new Card("card_red.png", MID_X - CARD_WIDTH - 25, 25, CARD_WIDTH, CARD_HEIGHT);
+        card2 = new Card("card_green.png", MID_X, 25, CARD_WIDTH, CARD_HEIGHT);
+        card3 = new Card("card_blue.png", MID_X + CARD_WIDTH + 25, 25, CARD_WIDTH, CARD_HEIGHT);
+
         Gdx.input.setInputProcessor(this);
-        EventManager.register(card);
-        EventManager.register(tower);
-    }
-
-    private void createCard() {
-        float w = 70;
-        float h = 100;
-        float x = Gdx.graphics.getWidth() / 2 - w / 2;
-        float y = 25;
-        card = new Card(Color.RED, x, y, w, h);
-    }
-
-    private void createInfo() {
-        info1 = new Info("* Left click on the card to select it.", Color.WHITE, 10, Gdx.graphics.getHeight() - 10);
-        info2 = new Info("* Right click on the card to deselect it.", Color.WHITE, 10, Gdx.graphics.getHeight() - 30);
-    }
-
-    private void createTower() {
-        float x = 25;
-        float y = 25;
-        float w = 50;
-        float h = 300;
-        tower = new Tower(x, y, w, h);
     }
 
     @Override
     public void render() {
         ScreenUtils.clear(0, 0, 0, 1);
-        info1.render();
-        info2.render();
-        card.render(shapeRenderer);
-        tower.render(shapeRenderer);
-    }
 
-    @Override
-    public void dispose() {
-        shapeRenderer.dispose();
-        info1.dispose();
-        info2.dispose();
-        card.dispose();
-        tower.dispose();
+        card1.render();
+        card2.render();
+        card3.render();
     }
 
     @Override
@@ -85,12 +51,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        card1.touchDown(screenX, screenY, pointer, button);
+        card2.touchDown(screenX, screenY, pointer, button);
+        card3.touchDown(screenX, screenY, pointer, button);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        card.touchUp(screenX, screenY, pointer, button);
         return false;
     }
 
@@ -106,12 +74,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        card.mouseMoved(screenX, screenY);
         return false;
     }
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
         return false;
+    }
+
+    @Override
+    public void dispose() {
+        card1.dispose();
+        card2.dispose();
+        card3.dispose();
     }
 }

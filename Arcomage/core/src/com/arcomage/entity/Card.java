@@ -1,97 +1,125 @@
 package com.arcomage.entity;
 
-import com.arcomage.core.Event;
-import com.arcomage.core.EventListener;
-import com.arcomage.core.EventManager;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
-public class Card implements EventListener {
-    private Color fillColor;
-    private Color borderColor;
+public class Card {
     private float x;
     private float y;
-    private float w;
-    private float h;
-    private Sound sound;
-    private boolean highlight;
-    private boolean selected;
-    private float xTemp;
-    private float yTemp;
-    private boolean usable;
 
-    public Card(Color color, float x, float y, float w, float h) {
-        this.fillColor = color;
+    private float width;
+    private float height;
+
+    private Texture texture;
+    private Image image;
+    private SpriteBatch spriteBatch;
+
+    private Action action1;
+    private Action action2;
+    private Action actionComplete;
+    private int actionType;
+
+    private Sound sound;
+
+    private static boolean available = true;
+
+    public Card(String fileName, float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
-        this.w = w;
-        this.h = h;
-        sound = Gdx.audio.newSound(Gdx.files.internal("card.mp3"));
-        usable = true;
+
+        this.width = width;
+        this.height = height;
+
+        this.texture = new Texture(Gdx.files.internal(fileName));
+
+        this.action1 = getAction1();
+        this.action2 = getAction2();
+        this.actionComplete = getActionComplete();
+
+        this.image = new Image(texture);
+        this.image.setPosition(x, y);
+        this.image.addAction(Actions.sequence(action1, actionComplete));
+
+        this.spriteBatch = new SpriteBatch();
+
+        this.sound = Gdx.audio.newSound(Gdx.files.internal("card.mp3"));
     }
 
-    public void render(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(fillColor);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(x, y, w, h);
-        shapeRenderer.end();
-        if (highlight || selected) {
-            if (highlight)
-                borderColor = Color.YELLOW;
-            if (selected)
-                borderColor = Color.GREEN;
-            shapeRenderer.setColor(borderColor);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.rect(x - 1, y - 1, w + 1, h + 1);
-            shapeRenderer.end();
+    private Action getAction1() {
+        return Actions.moveTo(
+            Gdx.graphics.getWidth() / 2 - texture.getWidth() / 2,
+            Gdx.graphics.getHeight() / 2 - texture.getHeight() / 2,
+            0.30f
+        );
+    }
+
+    private Action getAction2() {
+        return Actions.moveTo(
+            50,
+            Gdx.graphics.getHeight() - height - 50,
+            0.30f
+        );
+    }
+
+    private Action getActionComplete() {
+        return new Action() {
+            @Override
+            public boolean act(float delta) {
+                switch (actionType) {
+                    case 1:
+                        actionType = 2;
+                        image.getActions().clear();
+                        image.addAction(Actions.sequence(action2, actionComplete));
+                        sound.play();
+                        break;
+                    case 2:
+                        actionType = 0;
+                        image.getActions().clear();
+                        available = true;
+                        break;
+                }
+                return true;
+            }
+        };
+    }
+
+    public void render() {
+        spriteBatch.begin();
+        spriteBatch.draw(texture, image.getX(), image.getY());
+        spriteBatch.end();
+
+        if (actionType == 1 || actionType == 2) {
+            image.act(Gdx.graphics.getDeltaTime());
+        }
+    }
+
+    public void touchDown(int screenX, int screenY, int pointer, int button) {
+        if (!available)
+            return;
+
+        screenY = Gdx.graphics.getHeight() - screenY;
+
+        boolean collideX = screenX >= x && screenX <= (x + width);
+        boolean collideY = screenY >= y && screenY <= (y + height);
+
+        if (collideX && collideY && actionType == 0) {
+            actionType = 1;
+            available = false;
+            sound.play();
         }
     }
 
     public void mouseMoved(int screenX, int screenY) {
-        boolean fx = screenX >= x && screenX <= x + w;
-        boolean fy = Gdx.graphics.getHeight() - screenY >= y && Gdx.graphics.getHeight() - screenY <= y + h;
-        highlight = fx && fy && !selected;
-    }
-
-    public void touchUp(int screenX, int screenY, int pointer, int button) {
-        boolean fx = screenX >= x && screenX <= x + w;
-        boolean fy = screenY >= y && Gdx.graphics.getHeight() - screenY <= y + h;
-        if (fx && fy) {
-            if (button == Input.Buttons.LEFT) {
-                if (!usable) {
-                    return;
-                }
-                if (!selected) {
-                    selected = true;
-                    xTemp = x;
-                    yTemp = y;
-                    x = Gdx.graphics.getWidth() / 2 - w / 2;
-                    y = Gdx.graphics.getHeight() / 2 - h / 2;
-                    sound.play();
-                    EventManager.publish(new Event("CardSelected"));
-                }
-            } else if (button == Input.Buttons.RIGHT) {
-                if (selected) {
-                    selected = false;
-                    x = xTemp;
-                    y = yTemp;
-                    sound.play();
-                }
-            }
-        }
-    }
-
-    @Override
-    public void handleEvent(Event event) {
-        if (event.getName().equals("TowerDestroyed")) {
-            usable = false;
-        }
     }
 
     public void dispose() {
+        texture.dispose();
+        spriteBatch.dispose();
         sound.dispose();
     }
 }
