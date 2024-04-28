@@ -3,10 +3,10 @@ package com.arcomage.screen;
 import com.arcomage.Game;
 import com.badlogic.gdx.Screen;
 
-public abstract class AbstractScreen implements Screen {
+public abstract class BaseScreen implements Screen {
     protected final Game game;
 
-    public AbstractScreen(Game game) {
+    public BaseScreen(Game game) {
         this.game = game;
     }
 

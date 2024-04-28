@@ -13,6 +13,10 @@ public final class EventManager {
         listeners.add(eventListener);
     }
 
+    public static void unregister(EventListener eventListener) {
+        listeners.remove(eventListener);
+    }
+
     public static void publish(Event event) {
         for (EventListener listener : listeners) {
             listener.handleEvent(event);

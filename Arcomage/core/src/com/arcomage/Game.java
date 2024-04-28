@@ -1,20 +1,9 @@
 package com.arcomage;
 
-import com.arcomage.core.Event;
-import com.arcomage.core.EventManager;
-import com.arcomage.core.ScreenEvent;
-import com.arcomage.entity.Card;
-import com.arcomage.entity.Info;
-import com.arcomage.entity.Tower;
-import com.arcomage.screen.MainMenuScreen;
-import com.arcomage.screen.PauseMenuScreen;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Game extends ApplicationAdapter implements InputProcessor {
     private Screen currentScreen;
@@ -33,7 +22,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public void render() {
-
+        if (currentScreen != null) {
+            currentScreen.render(Gdx.graphics.getDeltaTime());
+        }
     }
 
     @Override

@@ -5,19 +5,17 @@ import com.arcomage.core.Event;
 import com.arcomage.core.EventListener;
 import com.arcomage.core.EventManager;
 import com.arcomage.core.ScreenEvent;
+import com.arcomage.entity.Button;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class MainMenuScreen extends AbstractScreen implements EventListener {
+public class MainMenuScreen extends BaseScreen implements EventListener {
     private Stage stage;
-    private Skin skin;
+    private Button playButton;
+    private Button exitButton;
 
     public MainMenuScreen(Game game) {
         super(game);
@@ -26,39 +24,52 @@ public class MainMenuScreen extends AbstractScreen implements EventListener {
 
     @Override
     public void show() {
-        stage = new Stage(new ScreenViewport());  // Ensure the stage is using a ScreenViewport.
+        stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));  // Ensure this file is correctly formatted and exists.
-
-        // Creating the layout
-        Table table = new Table();
-        table.setFillParent(true);
-        stage.addActor(table);
-
-        // Adding buttons
-        TextButton playButton = new TextButton("Play", skin);
-        TextButton exitButton = new TextButton("Exit", skin);
-
-        // Add buttons to table
-        table.add(playButton).fillX().uniformX();
-        table.row().pad(10, 0, 10, 0);
-        table.add(exitButton).fillX().uniformX();
-
-
-    }
-
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Clear the screen
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        playButton = new Button("Play",
+                Gdx.graphics.getWidth() / 3,
+                Gdx.graphics.getHeight() / 2,
+                Gdx.graphics.getWidth() / 8,
+                Gdx.graphics.getHeight() / 6,
+                Color.GREEN
+                );
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(playButton);
+        Gdx.input.setInputProcessor(inputMultiplexer);
+        EventManager.register(this);
         stage.draw();
     }
 
     @Override
+    public void hide() {
+        if (stage != null) {
+            stage.dispose();
+        }
+
+        if (playButton != null) {
+            playButton.dispose();
+        }
+
+        EventManager.unregister(this);
+    }
+
+    @Override
+    public void render(float delta) {
+
+    }
+
+    @Override
     public void handleEvent(Event event) {
-        if(event.getName() == ScreenEvent.PLAY_GAME) {
-            game.setScreen(new GameScreen(game));
+        Gdx.app.log("Button", event.getName());
+        if ("PlayButtonPressed".equals(event.getName())) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    game.setScreen(new GameScreen(game));
+                }
+            });
         }
 
         if(event.getName() == ScreenEvent.EXIT_GAME) {
@@ -69,6 +80,7 @@ public class MainMenuScreen extends AbstractScreen implements EventListener {
     @Override
     public void dispose() {
         stage.dispose();
-        skin.dispose();
+        playButton.dispose();
+        exitButton.dispose();
     }
 }

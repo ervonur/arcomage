@@ -1,7 +1,6 @@
 package com.arcomage.screen;
 
 
-import com.arcomage.ArcomageGame;
 import com.arcomage.Game;
 import com.arcomage.core.EventManager;
 import com.arcomage.entity.Card;
@@ -13,9 +12,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class GameScreen extends AbstractScreen implements InputProcessor {
+public class GameScreen extends BaseScreen implements InputProcessor {
     public GameScreen(Game game) {
         super(game);
+
     }
 
     private ShapeRenderer shapeRenderer;
@@ -23,13 +23,13 @@ public class GameScreen extends AbstractScreen implements InputProcessor {
     private Card card;
     private Tower tower;
 
-    public GameScreen(ArcomageGame game) {
-        super(game);
+    @Override
+    public void show() {
         shapeRenderer = new ShapeRenderer();
+        Gdx.input.setInputProcessor(this);
         createInfo();
         createCard();
         createTower();
-        Gdx.input.setInputProcessor(this);
         EventManager.register(card);
         EventManager.register(tower);
     }
